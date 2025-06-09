@@ -46,6 +46,12 @@ li <- exif_read(imported,
                 args = c("-s", "-n")) |> 
   filter(!is.na(LensModel))
 
+if (!("LensInfo" %in% colnames(li))) {
+  li <- li |>
+  add_column(NA) |> 
+  rename("LensInfo" = "NA")
+}
+
 # amend Nikon and Apple lens information
 # means lower case for lensmake and adaptation of lensmodel
 # (hardcoded in a mapping table)
