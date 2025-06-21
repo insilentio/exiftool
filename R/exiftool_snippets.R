@@ -30,7 +30,7 @@ extract_paths <- function(input = "~/Pictures/Exif-export.csv") {
 #'
 #' @examples output_paths(extract_paths())
 output_paths <- function(paths,
-                         output = "~/Pictures/Album/paths.txt") {
+                         output = "~/Pictures/paths.txt") {
   write_csv2(paths |> 
              select(full),
              output,
