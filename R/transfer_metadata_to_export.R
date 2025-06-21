@@ -1,52 +1,58 @@
-path <- "/Volumes/NoBackup/Bilder/Export/Album"
-path2 <- "/Users/Daniel/Pictures/Album"
+path_to <- "/Volumes/NoBackup/Bilder/Export/ExportAlbum/2022/34 - Ausflug Jonduri und Papa/"
+path_from <- "/Users/Daniel/Pictures/Album/2022/34 - Ausflug Jonduri und Papa/"
 
-files_from <- tibble(
-  path_from = list.files(path2,
-                         recursive = TRUE,
-                         full.names = TRUE)
-) |>
-  mutate(match = str_sub(path_from, 1, nchar(path_from) - 4)) 
+# we can restrict the list of original files by modified date
+# this is very helpful if some photos were e.g. updated with metadata
+# just put the mtime to something like "01-01-1900" if you want to include all
+files_from <- file.info(list.files(path_from,
+                                   recursive = TRUE,
+                                   full.names = TRUE)) |> 
+  rownames_to_column("path_from") |> 
+  select(path_from, mtime) |> 
+  filter(mtime >= "2025-06-10") |> 
+  mutate(match = str_extract(path_from, ".*(?=\\..*)"))
 
-files <- tibble(
-  path_to = list.files(path,
+
+files_to <- tibble(
+  path_to = list.files(path_to,
                     recursive = TRUE,
                     full.names = TRUE)
   ) |>
-  filter(!(str_ends(path_to, "mov") | str_ends(path_to, "mp4"))) |> 
+  filter(str_ends(path_to, "jpg")) |> 
   mutate(name_to = str_extract(path_to, "[0-9]{4}-.*")) |> 
   mutate(dir_to = str_sub(path_to, 1, nchar(path_to) - nchar(name_to))) |> 
   mutate(name_from = str_remove(name_to, "[0-9]{4}-([0-9]{2}[-_]){5}")) |> 
-  mutate(dir_from = str_replace(dir_to, ".*\\/Album", "/Users/Daniel/Pictures/Album")) |> 
+  mutate(dir_from = str_replace(dir_to, ".*\\/ExportAlbum", "/Users/Daniel/Pictures/Album")) |> 
   mutate(match = paste0(dir_from, name_from)) |>
-  mutate(match = str_sub(match, 1, nchar(match) - 4)) |>
-  left_join(files_from, by = "match") |> 
+  mutate(match = str_sub(match, 1, nchar(match) - 4)) 
+
+# make sure that you get the expected sizes for each dataframe
+# for a complete transfer, files_to and files_from need to be the same size!
+# check also with these helpers for duplicates etc.:
+files_to |> 
+  group_by(match) |> 
+  filter(n() > 1) |> 
+  pull(path_to)
+
+files_from |> 
+  group_by(match) |> 
+  filter(n() > 1) |> 
+  pull(path_from)
+
+files_anti <- files_to |> 
+  anti_join(files_from, by = "match") |> 
+  select(match)
+# end of checks
+
+
+files <- files_from |>
+  left_join(files_to, by = "match") |> 
   select(match, path_to, path_from)
 
-
 for (i in 1:nrow(files)) {
-  # args <- c("-all=", "-tagsfromfile", "@", "-icc_profile", "-tagsfromfile", files$path_from[i],
-  #           "-exif:all", "-xmp:all", "-iptc:all", "--makernotes:all", "--icc_profile:all", "--on1ref")
-  
   args <- c("-exif:all=", "-xmp:all=", "-iptc:all=", "-iptcdigest=", "-tagsfromfile", files$path_from[i],
-            "-exif:all", "-xmp:all", "-iptc:all", "--on1ref", "-makernotes:all=")
+            "-exif:all", "-xmp:all", "-iptc:all", "--on1ref", "--orientation", "-makernotes:all=", "-m")
   
   exif_call(args = args, path = files$path_to[i])
 }
 
-
-
-files <- tibble(
-  path_to = list.files(path,
-                       recursive = TRUE,
-                       full.names = TRUE)
-) |>
-  filter(!(str_ends(path_to, "mov") | str_ends(path_to, "mp4"))) |> 
-  mutate(name_to = str_extract(path_to, "[0-9]{4}-.*")) |> 
-  mutate(dir_to = str_sub(path_to, 1, nchar(path_to) - nchar(name_to))) |> 
-  mutate(name_from = str_remove(name_to, "[0-9]{4}-([0-9]{2}[-_]){5}")) |> 
-  mutate(dir_from = str_replace(dir_to, ".*\\/Album", "/Users/Daniel/Pictures/Album")) |> 
-  mutate(match = paste0(dir_from, name_from)) |>
-  mutate(match = str_sub(match, 1, nchar(match) - 4)) |> 
-  anti_join(files_from, by = "match") |> 
-  select(path_to)
