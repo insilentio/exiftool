@@ -46,6 +46,12 @@ li <- exif_read(imported,
                 args = c("-s", "-n")) |> 
   filter(!is.na(LensModel))
 
+if (!("LensInfo" %in% colnames(li))) {
+  li <- li |>
+  add_column(NA) |> 
+  rename("LensInfo" = "NA")
+}
+
 # amend Nikon and Apple lens information
 # means lower case for lensmake and adaptation of lensmodel
 # (hardcoded in a mapping table)
@@ -64,6 +70,7 @@ modify <- li |>
 
 # I don't think there is an option in exiftool to update pictures from a list
 # of tag values, hence a for loop:
+# addendum: could be done via a csv file
 for (i in 1:nrow(modify)){
   this <- modify[i,]
   args <- c(paste0("-LensModel=", this$LensModel),
@@ -81,7 +88,15 @@ for (i in 1:nrow(modify)){
 
 # complete the information in the various location tags
 # currently for NEF files only
-complete_location(imported[grepl(pattern = "*.nef", imported)])
+#complete_location(imported[grepl(pattern = "*.nef", imported)])
+
+complete_location(imported)
+
+
+# open issues -------------------------------------------------------------
+
+# focal length 35mm?
+# '-focallengthin35mmformat=19 mm'
 
 
 # final cleanup -----------------------------------------------------------

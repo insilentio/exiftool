@@ -32,5 +32,5 @@ for (i in 1:nrow(models)) {
               col_names = FALSE)
   
   # execute system command
-  system("exiftool -@ ~/Pictures/Album/lenses.txt -@ ~/Pictures/Album/paths.txt")
+  system("exiftool -@ ~/Pictures/lenses.txt -@ ~/Pictures/paths.txt")
 }
