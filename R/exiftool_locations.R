@@ -1,7 +1,30 @@
-# sets iptc and xmp location tags from each other respectively
-
-complete_location <- function(path){
-  require("exiftoolr")
+#' Sets iptc and xmp location tags from each other respectively
+#' 
+#' @description Sets the tags for city, province and country from IPTC group to XMP group and vice versa.
+#' Goal is to have all available location info identical in both groups. This is necessary because many
+#' programs consider different groups for that information which leads to inconsistencies.
+#' It uses per default the csv option of exifool to handle different values for different files,
+#' which is much faster than a for loop which calls exiftool every time.
+#' Exiftool per default creates copies of the original files (*_original); this behaviour can be modified by parameter.
+#'
+#' @param paths List of photos to be modified. Needs a character vector with full file names
+#' @param csv_execute logical, to determine whether modification should be directly written or returned as tibble
+#' @param csv_path path and file name of the output csv file
+#' @param delete_original whether the original copies of the photos should be deleted afterwards or not
+#'
+#' @returns depending on param csv_execute:
+#' - if TRUE,  writes the tag values as csv file and writes them via exiftool to pictures
+#' - if FALSE, returns the tags as tibble
+#' @export
+#'
+#' @examples complete_location("Test.jpg")
+complete_location <- function(paths,
+                              csv_execute = TRUE,
+                              csv_path = '~/Pictures/locations.csv',
+                              delete_original = FALSE){
+  
+  require(exiftoolr)
+  require(dplyr)
   
   req_columns = c("SourceFile", "IPTCDigest",
                   "XMP:City", "IPTC:City",
@@ -14,7 +37,7 @@ complete_location <- function(path){
             paste0("-", req_columns[5]),
             paste0("-", req_columns[6]),
             paste0("-", req_columns[7]))
-  locations <- exif_read(args = args, path = path)
+  locations <- exif_read(args = args, path = paths)
   
   # check if one of the desired tags is completely missing and add it if necessary
   missing_col = req_columns[!(req_columns %in% colnames(locations))]
@@ -33,10 +56,5 @@ complete_location <- function(path){
     mutate(`IPTC:Country-PrimaryLocationName` = ifelse(is.na(`IPTC:Country-PrimaryLocationName`), `XMP:Country`, `IPTC:Country-PrimaryLocationName`)) |> 
     mutate(IPTCDigest = "-")
   
-  # now use the csv option of exifool to handle different values for different files
-  # this is much faster than a for loop which calls exiftool every time
-  loc_path <- normalizePath('~/Pictures/locations.csv')
-  locations |> write_csv(loc_path)
-  
-  exif_call(args = c("-f", paste0("-csv=", loc_path)), path = path)
+  handle_return(locations, csv_execute, paths, csv_path, delete_original)
 }
