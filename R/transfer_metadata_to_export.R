@@ -7,7 +7,13 @@
 
 path_to <- "/Volumes/NoBackup/Bilder/Export/ExportAlbum/2022/34 - Ausflug Jonduri und Papa/"
 path_from <- "/Users/Daniel/Pictures/Album/2022/34 - Ausflug Jonduri und Papa/"
-modified_since <- "2025-06-10"
+modified_since <- "2025-06-20"
+
+library(tibble)
+library(dplyr)
+library(stringr)
+library(exiftoolr)
+source("R/helpers.R")
 
 # we can restrict the list of original files by modified date
 # this is very helpful if some photos were e.g. updated with metadata
@@ -63,4 +69,3 @@ for (i in 1:nrow(files)) {
   
   exif_call(args = args, path = files$path_to[i])
 }
-
