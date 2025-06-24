@@ -1,5 +1,5 @@
 # Performs necessary steps on metadata side for new pictures
-# in Import folder after Development work in ON1
+# in Import folder after Development work in ON1 and before Export
 # 
 # 1. copy xmp metadata information onto original file
 # 2. remove unnecessary side files
@@ -7,96 +7,53 @@
 # 4. amend lens information for Nikon in order to have consistent metadata
 # 5. amend lens information for Apple in order to have prime/zoom lens info consistent
 # 6. ensures completeness of location tags information
+# 7. cleanup
 
 library(exiftoolr)
-library(tidyverse)
+library(dplyr)
 source("R/exiftool_flatten.R")
 source("R/exiftool_locations.R")
-source("R/create_lensinfo.R")
+source("R/exiftool_lensinfo.R")
+source("R/exiftool_convert_to_35mm.R")
+source("R/helpers.R")
 
 # current import path
-imp_path <- "/Volumes/NoBackup/Bilder/Import/2025"
+imp_path <- "/Volumes/NoBackup/Bilder/Import/2025/"
 
 
-# XMP to original file ----------------------------------------------------
-
-# write xmp information onto NEF files and cleanup
+# Write XMP into original files and cleanup ----------------------------------------------------
 # (this needs to be done because ON1 writes NEF file metadata mostly into xmp)
-system(paste0("exiftool -r -ext nef -tagsfromfile ", imp_path, "/%-1:d%f.xmp ", imp_path))
+
+# caveat: the "/%1" indicates to which directory level relative to imp_path it is looking for xmp files and
+# therefore may need to be changed (e.g. when you go on Album level)
+exif_call(args = c("-r", "-ext", "nef", "-tagsfromfile", paste0(imp_path, "/%-1:d%f.xmp")), path = imp_path)
 system(paste0("find ", imp_path, " -name '*xmp' -exec rm {} \\;"))
-system(paste0("exiftool -r -delete_original! ", imp_path))
+exif_call(args = c("-r", "-delete_original!"), path = imp_path)
 
 
-# flatten keywords --------------------------------------------------------
+# generate file list and run metadata functions ---------------------------
 
-# flatten hierarchical subject
+# get complete file list
 imported <- list.files(imp_path,
                        recursive = TRUE,
                        full.names = TRUE)
 
+# flatten hierarchical keywords
 flatten_subject(imported)
 
 
-# lens information --------------------------------------------------------
+# lens information
+harmonize_lensinfo(imported)
 
-# lens information changes:
-# first read necessary information
-li <- exif_read(imported,
-                c("lensinfo", "lensmodel", "lens", "lensid", "lensmake"),
-                args = c("-s", "-n")) |> 
-  filter(!is.na(LensModel))
-
-if (!("LensInfo" %in% colnames(li))) {
-  li <- li |>
-  add_column(NA) |> 
-  rename("LensInfo" = "NA")
-}
-
-# amend Nikon and Apple lens information
-# means lower case for lensmake and adaptation of lensmodel
-# (hardcoded in a mapping table)
-#mapping table
-mapping <- read_csv("Data/LensMapping.csv")
-
-modify <- li |> 
-  mutate(LensMake = ifelse(LensMake == "NIKON", "Nikon", LensMake)) |> 
-  left_join(mapping, by = join_by(LensModel == model_old)) |> 
-  mutate(LensModel = ifelse(is.na(model_new), LensModel, model_new), 
-         Lens = ifelse(is.na(model_new), LensModel, model_new)) |> 
-  mutate(LensInfo = ifelse((is.na(LensInfo) | (LensMake == "Apple")),
-                           unlist(Vectorize(create_lensinfo)(LensModel, FALSE)),
-                           LensInfo))
-
-
-# I don't think there is an option in exiftool to update pictures from a list
-# of tag values, hence a for loop:
-# addendum: could be done via a csv file
-for (i in 1:nrow(modify)){
-  this <- modify[i,]
-  args <- c(paste0("-LensModel=", this$LensModel),
-            paste0("-Lens=", this$Lens),
-            paste0("-exif:lensinfo=", this$LensInfo),
-            paste0("-xmp:lensinfo=", this$LensInfo),
-            paste0("-LensMake=", this$LensMake)
-  )
-  
-  exif_call(args, this$SourceFile)
-}
-
-
-# location information ----------------------------------------------------
 
 # complete the information in the various location tags
-# currently for NEF files only
-#complete_location(imported[grepl(pattern = "*.nef", imported)])
-
 complete_location(imported)
 
 
 # open issues -------------------------------------------------------------
 
 # focal length 35mm?
-# '-focallengthin35mmformat=19 mm'
+# convert35(imported)
 
 
 # final cleanup -----------------------------------------------------------

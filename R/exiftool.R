@@ -1,11 +1,49 @@
-# update after ON1 migration
+# file contains various manual code which has been used in the context of metadata cleanup
+
 
 library(exiftoolr)
-library(tidyverse)
+library(dplyr)
+library(readr)
+source("R/helpers.R")
+source("R/exiftool_locations.R")
+source("R/exiftool_flatten.R")
+
+
+# renaming helper ----------------------------------------------------------
+# this renames pictures based on a manually created csv file
+naming <- read_csv("~/Pictures/names.csv") |> 
+  select(OLDNAME, NEWNAME)
+
+for (i in 1:nrow(naming)){
+  cmd <- paste0("mv '", naming[i, 1], "' '", naming[i, 2], "'")
+  
+  system(cmd)
+}
+
+
+# call location completer manually ----------------------------------------
+#  (usually via prepare_import)
+path <- '/Volumes/NoBackup/Bilder/Export/ExportAlbum/2021/30 - Herbstferien Kroatien/'
+path <- list.files(path,
+                   full.names = TRUE)
+complete_location(path)
 
 
 
+# flatten keywords --------------------------------------------------------
+# simple code to flatten hierarchical subjects
+# as default uses the paths indicated in Exif-info.csv which is generated
+# by PhotoStatistica
+paths <- extract_paths() |> 
+  pull(full)
+
+flatten_subject(paths)
+
+
+
+# update after ON1 migration ----------------------------------------------# 
 ##update with lr hierarchical keywords where necessary
+# this needs a file which was lost :-(
 paths <- extract_paths()
 argsread <-
   c("-hierarchicalsubject",
@@ -37,9 +75,6 @@ exif_call(args = argsread, path = pull(paths[i]))
 i <- i + 1
 
 
-
-
-
 path <- "/Users/Daniel/Pictures/Album/2016/50 - Ausflug nach Fribourg zur CDK/D7200_09015.dng"
 ##Bereinigung Metadaten, Entfernung von Unnützem
 argsread <- c("-a", "-u", "-s", "-G1", "-e")
@@ -49,49 +84,21 @@ grp <- c("*catalog*", "*rating*", "*categor*", "*label*", "*caption*", "*tag*", 
          "city*", "*state*", "*state*", "*country*", "*region*")
 argsread <- c(argsread, paste0("-", grp))
 
-#XMP-mediapro
-grp <- "XMP-mediapro:all"
-argsread <- c(argsread, paste0("-", grp))
-
-#XMP-acdsee
-grp <- "XMP-acdsee:all"
-argsread <- c(argsread, paste0("-", grp))
-
-grp <- "XMP-microsoft:all"
-argsread <- c(argsread, paste0("-", grp))
-
-grp <- "XMP-digikam:all"
-argsread <- c(argsread, paste0("-", grp))
-
-grp <- "XMP-crs:all"
-argsread <- c(argsread, paste0("--", grp))
-
-grp <- "XMP-crss:all"
-argsread <- c(argsread, paste0("--", grp))
-
-grp <- "xmpMM:all"
-argsread <- c(argsread, paste0("-", grp))
-
-grp <- "XMP-photoshop:all"
-argsread <- c(argsread, paste0("-", grp))
-
-grp <- "XMP-lr:all"
-argsread <- c(argsread, paste0("-", grp))
-
-grp <- "XMP-video:all"
-argsread <- c(argsread, paste0("-", grp))
-
-grp <- "XMP-tiff:all"
-argsread <- c(argsread, paste0("-", grp))
-
-grp <- "XMP-mp:all"
-argsread <- c(argsread, paste0("-", grp))
-
-grp <- "XMP-mwg-rs:all"
-argsread <- c(argsread, paste0("-", grp))
-
-grp <- "XMP-iptcext:all"
-argsread <- c(argsread, paste0("-", grp))
+argsread <- c(argsread,
+              "-XMP-mediapro:all",
+              "-XMP-acdsee:all",
+              "-XMP-microsoft:all",
+              "-XMP-digikam:all",
+              "-XMP-crs:all",
+              "-XMP-crss:all",
+              "-xmpMM:all",
+              "-XMP-photoshop:all",
+              "-XMP-lr:all",
+              "-XMP-video:all",
+              "-XMP-tiff:all",
+              "-XMP-mp:all",
+              "-XMP-mwg-rs:all",
+              "-XMP-iptcext:all")
 
 tags <- exif_call(args = argsread, path = path, intern = TRUE)
 tags <- tibble(

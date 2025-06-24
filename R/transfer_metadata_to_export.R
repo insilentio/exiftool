@@ -1,5 +1,19 @@
+# Sometimes there are discrepancies in metadata between the original photos and the ones 
+# in Export Album.
+# This code helps to transfer all relevant metadata to the exported photos in one go, for whole directories.
+# Parameter "modified_since" helps to restrict affected photos to the ones modified since that date,
+# e.g. when updating metadata in ON1, they can then be easily transferred to existing Export photos.
+
+
 path_to <- "/Volumes/NoBackup/Bilder/Export/ExportAlbum/2022/34 - Ausflug Jonduri und Papa/"
 path_from <- "/Users/Daniel/Pictures/Album/2022/34 - Ausflug Jonduri und Papa/"
+modified_since <- "2025-06-20"
+
+library(tibble)
+library(dplyr)
+library(stringr)
+library(exiftoolr)
+source("R/helpers.R")
 
 # we can restrict the list of original files by modified date
 # this is very helpful if some photos were e.g. updated with metadata
@@ -9,7 +23,7 @@ files_from <- file.info(list.files(path_from,
                                    full.names = TRUE)) |> 
   rownames_to_column("path_from") |> 
   select(path_from, mtime) |> 
-  filter(mtime >= "2025-06-10") |> 
+  filter(mtime >= modified_since) |> 
   mutate(match = str_extract(path_from, ".*(?=\\..*)"))
 
 
@@ -55,4 +69,3 @@ for (i in 1:nrow(files)) {
   
   exif_call(args = args, path = files$path_to[i])
 }
-
