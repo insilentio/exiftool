@@ -19,7 +19,7 @@
 #' @examples convert35("Test.jpg")
 convert35 <- function(paths,
                       csv_execute = TRUE,
-                      csv_path = '~/Pictures/locations.csv',
+                      csv_path = '~/Pictures/fl.csv',
                       delete_original = FALSE){
   
   require(exiftoolr)
