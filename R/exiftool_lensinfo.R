@@ -75,9 +75,14 @@ harmonize_lensinfo <- function(paths,
   
   args <- c("-G", "-s", "-n", "-lensinfo", "-lensmodel", "-lens", "-lensmake")
 
+  # read only metadata of photos where LensModel is known
   li <- exif_read(args = args, path = paths) |> 
     filter(!is.na(`EXIF:LensModel`))
   
+  # check if the lensinfo tag is completely missing and add it if necessary
+  if (!"EXIF:LensInfo" %in% colnames(li))
+    li <- li |> add_column("EXIF:LensInfo" = NA)
+
   # amend Nikon and Apple lens information
   # means lower case for lensmake and adaptation of lensmodel
 
