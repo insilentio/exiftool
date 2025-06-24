@@ -45,6 +45,7 @@ output_paths <- function(paths,
 #' @param paths List of photos to be modified. Needs a character vector with full file names
 #' @param csv_path path and file name of the output csv file
 #' @param delete_original whether the original copies of the photos should be deleted afterwards or not
+#' @param with_sep for list type tags like keywords, you need to indicate which separator is used
 #'
 #' @returns depending on param csv_execute:
 #' - if TRUE,  writes the tag values as csv file and writes them via exiftool to pictures
@@ -52,12 +53,18 @@ output_paths <- function(paths,
 #' @export
 #'
 #' @examples
-handle_return <- function(df, csv_execute, paths, csv_path, delete_original) {
+handle_return <- function(df, csv_execute, paths, csv_path, delete_original, with_sep = NULL) {
+  
+  if (is.null(with_sep))
+    sep <- ""
+  else
+    sep <- paste0("-sep '", with_sep, "'")
+  
   if (csv_execute){
     loc_path <- normalizePath(csv_path, mustWork = FALSE)
     df |> write_csv(loc_path)
     
-    exif_call(args = c("-f", paste0("-csv=", loc_path)), path = paths)
+    exif_call(args = c("-f", paste0("-csv=", loc_path)), common_args = sep, path = paths)
     
     if (delete_original)
       exif_call(args = c("-r", "-delete_original!"), path = unique(dirname(paths)))

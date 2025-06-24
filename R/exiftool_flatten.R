@@ -35,5 +35,5 @@ flatten_subject <- function(paths,
     mutate(`IPTC:Keywords` = subject) |> 
     rename(`XMP:Subject` = subject)
   
-  handle_return(subjects, csv_execute, paths, csv_path, delete_original)
+  handle_return(subjects, csv_execute, paths, csv_path, delete_original, with_sep = ", ")
 }
