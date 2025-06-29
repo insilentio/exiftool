@@ -13,7 +13,8 @@
 #'
 #' @param imp_path current import path to work on. The number of subordinate directory levels is indicated
 #' by the parameter 'level_below'.
-#' @param level_below number of levels below imp_path where pictures are effectively stored
+#' @param level_below indicates to which directory level relative to imp_path it is looking for xmp files and
+#' therefore may need to be changed (e.g. on year level -> 2, on album level -> 3)
 #'
 #' @returns nothing
 #' @export
@@ -30,12 +31,9 @@ prepare_export <- function(imp_path = "/Volumes/NoBackup/Bilder/Import/2025/", l
   
   # Write XMP into original files and cleanup ----------------------------------------------------
   # (this needs to be done because ON1 writes NEF file metadata mostly into xmp)
-  
-  # caveat: the "/%1" indicates to which directory level relative to imp_path it is looking for xmp files and
-  # therefore may need to be changed (e.g. when you go on Album level)
   exif_call(args = c("-r", "-ext", "nef", "-tagsfromfile", paste0(imp_path, "/%-", level_below, ":d%f.xmp")),
             path = imp_path)
-  system(paste0("find ", imp_path, " -name '*xmp' -exec rm {} \\;"))
+  system(paste0("find '", imp_path, "' -name '*xmp' -exec rm {} \\;"))
   exif_call(args = c("-r", "-delete_original!"), path = imp_path)
   
   
