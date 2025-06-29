@@ -1,12 +1,17 @@
 # file contains various manual code which has been used in the context of metadata cleanup
 
-
 library(exiftoolr)
 library(dplyr)
 library(readr)
 source("R/helpers.R")
 source("R/exiftool_locations.R")
 source("R/exiftool_flatten.R")
+source("R/prepare_export.R")
+
+# run the metadata enrichment stuff before exporting photos from ON1
+prepare_export(imp_path = "/Volumes/NoBackup/Bilder/Import/2025/33 - Geburri Ladina/", level_below = "0")
+# ON1 generates new xmp upon "read metadata from photo", let's delete them again
+system(paste0("find '", imp_path, "' -name '*xmp' -exec rm {} \\;"))
 
 
 # renaming helper ----------------------------------------------------------
