@@ -3,19 +3,43 @@
 library(exiftoolr)
 library(dplyr)
 library(readr)
+library(lubridate)
+library(rstudioapi)
+library(stringr)
 source("R/helpers.R")
 source("R/exiftool_locations.R")
 source("R/exiftool_flatten.R")
 source("R/prepare_export.R")
+source("R/exiftool_lensinfo.R")
+source("R/exiftool_convert_to_35mm.R")
+
+
+# default metadata work before and after ON1 export -----------------------
+# select import folder to act upon
+imported <- selectDirectory(caption = "Select directory",
+                            path = paste0("/Volumes/NoBackup/Bilder/Import/", year(Sys.Date())))
+# tries automagically to determine on which level the prepare_export() should be run
+lb <- abs((str_extract(imported, "\\/(Bilder|Pictures).*") |> 
+  str_count("\\/")) - 4 )
 
 # run the metadata enrichment stuff before exporting photos from ON1
-prepare_export(imp_path = "/Volumes/NoBackup/Bilder/Import/2025/33 - Geburri Ladina/", level_below = "0")
-# ON1 generates new xmp upon "read metadata from photo", let's delete them again
-system(paste0("find '", imp_path, "' -name '*xmp' -exec rm {} \\;"))
+prepare_export(imp_path = imported, level_below = lb)
 
+# run the cleanup and metadata enrichment stuff after jpg export from ON1
+after_export(imp_path = imported)
+
+
+# metadata transfer -------------------------------------------------------
+
+path_to <- "/Volumes/NoBackup/Bilder/Export/ExportAlbum/2022/34 - Ausflug Jonduri und Papa/"
+path_from <- "/Users/Daniel/Pictures/Album/2022/34 - Ausflug Jonduri und Papa/"
+modified_since <- "2025-06-20"
+
+transfer_metadata(path_to, path_from, modified_since, delete_original = TRUE)
 
 # renaming helper ----------------------------------------------------------
 # this renames pictures based on a manually created csv file
+# (to make file names more congruent, e.g. adding the camera model)
 naming <- read_csv("~/Pictures/names.csv") |> 
   select(OLDNAME, NEWNAME)
 
@@ -28,27 +52,18 @@ for (i in 1:nrow(naming)){
 
 # call location completer manually ----------------------------------------
 #  (usually via prepare_import)
-path <- '/Volumes/NoBackup/Bilder/Export/ExportAlbum/2021/30 - Herbstferien Kroatien/'
-path <- list.files(path,
-                   full.names = TRUE)
-complete_location(path)
-
+complete_location(paths)
 
 
 # flatten keywords --------------------------------------------------------
-# simple code to flatten hierarchical subjects
-# as default uses the paths indicated in Exif-info.csv which is generated
-# by PhotoStatistica
-paths <- extract_paths() |> 
-  pull(full)
-
+#  (usually via prepare_import)
 flatten_subject(paths)
-
 
 
 # update after ON1 migration ----------------------------------------------# 
 ##update with lr hierarchical keywords where necessary
 # this needs a file which was lost :-(
+# (this is some old code which I don't really know what it was used for)
 paths <- extract_paths()
 argsread <-
   c("-hierarchicalsubject",

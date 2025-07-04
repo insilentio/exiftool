@@ -28,7 +28,7 @@ convert35 <- function(paths,
   mapping <- read_csv("Data/CropFactor.csv")
   
   args <- c("-G", "-s", "-n", "-exif:focallength", "-exif:model")
-  focallength <- exif_read(args = args, path = path) |> 
+  focallength <- exif_read(args = args, path = paths) |> 
     left_join(mapping, by = join_by("EXIF:Model" == "model")) |> 
     mutate(`EXIF:FocalLengthIn35mmFormat` = `EXIF:FocalLength`*factor)
   
