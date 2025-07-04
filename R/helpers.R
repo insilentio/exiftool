@@ -37,7 +37,8 @@ output_paths <- function(paths,
 
 #' Handles the outcome of the various exiftool functions
 #' 
-#' @description depending on param csv_execute, either writes a csv_file
+#' @description depending on param csv_execute, either writes a csv_file with per photo specific metadata
+#' and runs exiftool on top of that to update the photos or returns the respective information as a tibble.
 #'
 #' @param df tibble or dataframe with the file and metadata information. Usually created within one
 #' of the exiftool_ file functions.
