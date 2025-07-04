@@ -72,6 +72,8 @@ harmonize_lensinfo <- function(paths,
                                lensinfo_only = FALSE){
   require(dplyr)
   require(readr)
+  require(tibble)
+  require(stringr)
   
   args <- c("-G", "-s", "-n", "-lensinfo", "-lensmodel", "-lens", "-lensmake")
 
