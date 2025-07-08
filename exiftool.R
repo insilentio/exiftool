@@ -1,11 +1,5 @@
 # file contains various manual code which is being used in the context of metadata cleanup
 
-library(exiftoolr)
-library(dplyr)
-library(readr)
-library(lubridate)
-library(rstudioapi)
-library(stringr)
 sapply(list.files("R", pattern = ".*\\.[Rr]", full.names = TRUE), source)
 
 

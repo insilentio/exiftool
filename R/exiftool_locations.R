@@ -23,9 +23,6 @@ complete_location <- function(paths,
                               csv_path = '~/Pictures/locations.csv',
                               delete_original = FALSE){
   
-  require(exiftoolr)
-  require(dplyr)
-  
   req_columns = c("SourceFile", "IPTCDigest",
                   "XMP:City", "IPTC:City",
                   "XMP:State", "IPTC:Province-State", 

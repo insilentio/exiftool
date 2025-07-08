@@ -11,8 +11,6 @@
 #'
 #' @examples create_lensinfo("Nikkor AF-S DX 16-80mm f/2.8-4E ED VR")
 create_lensinfo <- function(lensmodel, as_tags = TRUE){
-  require(dplyr)
-  require(stringr)
   
   typenew = as.data.frame(
     stringr::str_remove(lensmodel, ".* (?=[0-9.]{1,5}mm)") |> 

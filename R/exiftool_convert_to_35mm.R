@@ -22,9 +22,6 @@ convert35 <- function(paths,
                       csv_path = '~/Pictures/fl.csv',
                       delete_original = FALSE){
   
-  require(exiftoolr)
-  require(dplyr)
-  
   mapping <- read_csv("Data/CropFactor.csv")
   
   args <- c("-G", "-s", "-n", "-exif:focallength", "-exif:model")

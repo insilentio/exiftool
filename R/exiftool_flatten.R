@@ -22,9 +22,6 @@ flatten_subject <- function(paths,
                             csv_path = '~/Pictures/subjects.csv',
                             delete_original = FALSE){
   
-  require(exiftoolr)
-  require(dplyr)
-  
   args <- c("-G", "-s", "-hierarchicalsubject")
   
   subjects <- exif_read(args = args, path = paths) |> 

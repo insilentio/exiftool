@@ -21,13 +21,6 @@
 #'
 #' @examples prepare_export()
 prepare_export <- function(imp_path = "/Volumes/NoBackup/Bilder/Import/2025/", level_below = "1"){
-  require(exiftoolr)
-  require(dplyr)
-  source("R/exiftool_flatten.R")
-  source("R/exiftool_locations.R")
-  source("R/exiftool_lensinfo.R")
-  source("R/exiftool_convert_to_35mm.R")
-  source("R/helpers.R")
   
   # Write XMP into original files and cleanup ----------------------------------------------------
   # (this needs to be done because ON1 writes NEF file metadata mostly into xmp)

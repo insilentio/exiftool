@@ -11,7 +11,6 @@
 #'
 #' @examples after_export()
 after_export <- function(imp_path = "/Volumes/NoBackup/Bilder/Import/2025/"){
-  require(dplyr)
   
   # ON1 generates new xmp upon "read metadata from photo" in the previous step, let's delete them again
   system(paste0("find '", imp_path, "' -name '*xmp' -exec rm {} \\;"))

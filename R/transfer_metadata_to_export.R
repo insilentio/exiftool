@@ -21,12 +21,6 @@ transfer_metadata <- function(path_to,
                               ignore_warnings = FALSE,
                               delete_original = FALSE){
   
-  require(tibble)
-  require(dplyr)
-  require(stringr)
-  require(exiftoolr)
-  source("R/helpers.R")
-  
   # we can restrict the list of original files by modified date
   # this is very helpful if some photos were e.g. updated with metadata
   files_from <- file.info(list.files(path_from,
