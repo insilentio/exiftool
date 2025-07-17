@@ -8,19 +8,16 @@
 #'
 #' @returns nothing
 #' @export
-#'
-#' @examples after_export()
-after_export <- function(imp_path = "/Volumes/NoBackup/Bilder/Import/2025/"){
-  require(dplyr)
+after_export <- function(imp_path){
   
   # ON1 generates new xmp upon "read metadata from photo" in the previous step, let's delete them again
   system(paste0("find '", imp_path, "' -name '*xmp' -exec rm {} \\;"))
   
   # ON1 does not export 35mm focal length info nor lens type, must be added after jpg generation
   # -> generate the list of affected files first in Photo Statistica
-  if (showQuestion(title = "Exif_export", message="exif-export.csv generated?")){
+  if (rstudioapi::showQuestion(title = "Exif_export", message="exif-export.csv generated?")){
     paths <- extract_paths() |> 
-      pull(full)
+      dplyr::pull(full)
     
     convert35(paths)
     harmonize_lensinfo(paths, delete_original = TRUE)

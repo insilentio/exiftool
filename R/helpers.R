@@ -8,13 +8,11 @@
 #'
 #' @returns the calculated paths as a tibble
 #' @export 
-#'
-#' @examples extract_paths()
 extract_paths <- function(input = "~/Pictures/Exif-export.csv") {
-  read_csv(input, trim_ws = FALSE) |> 
-    select(1, 5, "Objektivmodell") |> 
-    rename(file = 1, path = 2, type = 3) |> 
-    mutate(full = paste0(path, "/", file))
+  readr::read_csv(input, trim_ws = FALSE) |> 
+    dplyr::select(1, 5, "Objektivmodell") |> 
+    dplyr::rename(file = 1, path = 2, type = 3) |> 
+    dplyr::mutate(full = paste0(path, "/", file))
 }
 
 
@@ -25,11 +23,9 @@ extract_paths <- function(input = "~/Pictures/Exif-export.csv") {
 #'
 #' @returns Invisibly writes a csv file into output
 #' @export
-#'
-#' @examples output_paths(extract_paths())
 output_paths <- function(paths,
                          output = "~/Pictures/paths.txt") {
-  write_csv2(paths |> select(full),
+  readr::write_csv2(paths |> dplyr::select(full),
              output,
              col_names = FALSE)
 }
@@ -51,9 +47,7 @@ output_paths <- function(paths,
 #' @returns depending on param csv_execute:
 #' - if TRUE,  writes the tag values as csv file and writes them via exiftool to pictures
 #' - if FALSE, returns the tags as tibble
-#' @export
 #'
-#' @examples
 handle_return <- function(df, csv_execute, paths, csv_path, delete_original, with_sep = NULL) {
   
   if (is.null(with_sep))
@@ -63,12 +57,12 @@ handle_return <- function(df, csv_execute, paths, csv_path, delete_original, wit
   
   if (csv_execute){
     loc_path <- normalizePath(csv_path, mustWork = FALSE)
-    df |> write_csv(loc_path)
+    df |> readr::write_csv(loc_path)
     
-    exif_call(args = c("-f", paste0("-csv=", loc_path)), common_args = sep, path = paths)
+    exiftoolr::exif_call(args = c("-f", paste0("-csv=", loc_path)), common_args = sep, path = paths)
     
     if (delete_original)
-      exif_call(args = c("-r", "-delete_original!"), path = unique(dirname(paths)))
+      exiftoolr::exif_call(args = c("-r", "-delete_original!"), path = unique(dirname(paths)))
   } else {
     df
   }

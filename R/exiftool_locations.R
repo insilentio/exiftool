@@ -16,15 +16,10 @@
 #' - if TRUE,  writes the tag values as csv file and writes them via exiftool to pictures
 #' - if FALSE, returns the tags as tibble
 #' @export
-#'
-#' @examples complete_location("Test.jpg")
 complete_location <- function(paths,
                               csv_execute = TRUE,
                               csv_path = '~/Pictures/locations.csv',
                               delete_original = FALSE){
-  
-  require(exiftoolr)
-  require(dplyr)
   
   req_columns = c("SourceFile", "IPTCDigest",
                   "XMP:City", "IPTC:City",
@@ -37,24 +32,24 @@ complete_location <- function(paths,
             paste0("-", req_columns[5]),
             paste0("-", req_columns[6]),
             paste0("-", req_columns[7]))
-  locations <- exif_read(args = args, path = paths)
+  locations <- exiftoolr::exif_read(args = args, path = paths)
   
   # check if one of the desired tags is completely missing and add it if necessary
   missing_col = req_columns[!(req_columns %in% colnames(locations))]
-  missing <- as_tibble(matrix(ncol = length(missing_col), nrow = 1, dimnames = list(NULL, missing_col)))
+  missing <- tibble::as_tibble(matrix(ncol = length(missing_col), nrow = 1, dimnames = list(NULL, missing_col)))
   locations <- locations |> 
-    add_column(missing) |>
-    select(all_of(req_columns))
+    tibble::add_column(missing) |>
+    dplyr::select(all_of(req_columns))
   
   # now fill missing cross-value tags, prio is IPTC 
   locations <- locations |> 
-    mutate(`XMP:City` = ifelse(!is.na(`IPTC:City`), `IPTC:City`, `XMP:City`)) |> 
-    mutate(`XMP:Country` = ifelse(!is.na(`IPTC:Country-PrimaryLocationName`), `IPTC:Country-PrimaryLocationName`, `XMP:Country`)) |> 
-    mutate(`XMP:State` = ifelse(!is.na(`IPTC:Province-State`), `IPTC:Province-State`, `XMP:State`)) |> 
-    mutate(`IPTC:City` = ifelse(is.na(`IPTC:City`), `XMP:City`, `IPTC:City`)) |> 
-    mutate(`IPTC:Province-State` = ifelse(is.na(`IPTC:Province-State`), `XMP:State`, `IPTC:Province-State`)) |> 
-    mutate(`IPTC:Country-PrimaryLocationName` = ifelse(is.na(`IPTC:Country-PrimaryLocationName`), `XMP:Country`, `IPTC:Country-PrimaryLocationName`)) |> 
-    mutate(IPTCDigest = "-")
+    dplyr::mutate(`XMP:City` = ifelse(!is.na(`IPTC:City`), `IPTC:City`, `XMP:City`)) |> 
+    dplyr::mutate(`XMP:Country` = ifelse(!is.na(`IPTC:Country-PrimaryLocationName`), `IPTC:Country-PrimaryLocationName`, `XMP:Country`)) |> 
+    dplyr::mutate(`XMP:State` = ifelse(!is.na(`IPTC:Province-State`), `IPTC:Province-State`, `XMP:State`)) |> 
+    dplyr::mutate(`IPTC:City` = ifelse(is.na(`IPTC:City`), `XMP:City`, `IPTC:City`)) |> 
+    dplyr::mutate(`IPTC:Province-State` = ifelse(is.na(`IPTC:Province-State`), `XMP:State`, `IPTC:Province-State`)) |> 
+    dplyr::mutate(`IPTC:Country-PrimaryLocationName` = ifelse(is.na(`IPTC:Country-PrimaryLocationName`), `XMP:Country`, `IPTC:Country-PrimaryLocationName`)) |> 
+    dplyr::mutate(IPTCDigest = "-")
   
   handle_return(locations, csv_execute, paths, csv_path, delete_original)
 }
