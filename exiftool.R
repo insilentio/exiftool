@@ -15,7 +15,7 @@ lb <- abs((stringr::str_extract(imported, "\\/(Bilder|Pictures).*") |>
 prepare_export(imp_path = imported, level_below = lb)
 
 # run the cleanup and metadata enrichment stuff after jpg export from ON1
-# currently needs list of affected export photos from PhotoStatistica
+# currently needs list of affected export photos from PhotoStatistica!!
 after_export(imp_path = imported)
  
 

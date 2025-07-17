@@ -49,8 +49,8 @@ prepare_export <- function(imp_path = "/Volumes/NoBackup/Bilder/Import/2025/", l
   
   # open issues -------------------------------------------------------------
   
-  # focal length 35mm?
-  # convert35(imported)
+  # focal length 35mm? this rather seems to be a post-export problem and is currently
+  # handled in after_export()
   
   
   # final cleanup -----------------------------------------------------------
