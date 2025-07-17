@@ -8,8 +8,6 @@
 #'
 #' @returns a tibble with either the raw lensinfo or already prepared as exiftool arguments, depending on param as_tags
 #' @export
-#'
-#' @examples create_lensinfo("Nikkor AF-S DX 16-80mm f/2.8-4E ED VR")
 create_lensinfo <- function(lensmodel, as_tags = TRUE){
   
   typenew = as.data.frame(
@@ -61,49 +59,43 @@ create_lensinfo <- function(lensmodel, as_tags = TRUE){
 #' - if TRUE,  writes the tag values as csv file and writes them via exiftool to pictures
 #' - if FALSE, returns the tags as tibble
 #' @export
-#'
-#' @examples harmonize_lensinfo("Test.jpg")
 harmonize_lensinfo <- function(paths,
                                csv_execute = TRUE,
                                csv_path = '~/Pictures/subjects.csv',
                                delete_original = FALSE,
                                lensinfo_only = FALSE){
-  require(dplyr)
-  require(readr)
-  require(tibble)
-  require(stringr)
   
   args <- c("-G", "-s", "-n", "-lensinfo", "-lensmodel", "-lens", "-lensmake")
 
   # read only metadata of photos where LensModel is known
-  li <- exif_read(args = args, path = paths) |> 
-    filter(!is.na(`EXIF:LensModel`))
+  li <- exiftoolr::exif_read(args = args, path = paths) |> 
+    dplyr::filter(!is.na(`EXIF:LensModel`))
   
   # check if the lensinfo tag is completely missing and add it if necessary
   if (!"EXIF:LensInfo" %in% colnames(li))
-    li <- li |> add_column("EXIF:LensInfo" = NA)
+    li <- li |> tibble::add_column("EXIF:LensInfo" = NA)
 
   # amend Nikon and Apple lens information
   # means lower case for lensmake and adaptation of lensmodel
 
   # mapping table
-  mapping <- read_csv("Data/LensMapping.csv")
+  mapping <- readr::read_csv("Data/LensMapping.csv")
   
   # change the information by joining the mapping table
   modify <- li |> 
-    mutate(`EXIF:LensMake` = ifelse(`EXIF:LensMake` == "NIKON", "Nikon", `EXIF:LensMake`)) |> 
-    left_join(mapping, by = join_by(`EXIF:LensModel` == model_old)) |> 
-    mutate(`EXIF:LensModel` = ifelse(is.na(model_new), `EXIF:LensModel`, model_new)) |> 
-    mutate(`XMP:Lens` = `EXIF:LensModel`) |> 
-    mutate(`EXIF:LensInfo` = ifelse((is.na(`EXIF:LensInfo`) | (`EXIF:LensMake` == "Apple")),
+    dplyr::mutate(`EXIF:LensMake` = ifelse(`EXIF:LensMake` == "NIKON", "Nikon", `EXIF:LensMake`)) |> 
+    dplyr::left_join(mapping, by = join_by(`EXIF:LensModel` == model_old)) |> 
+    dplyr::mutate(`EXIF:LensModel` = ifelse(is.na(model_new), `EXIF:LensModel`, model_new)) |> 
+    dplyr::mutate(`XMP:Lens` = `EXIF:LensModel`) |> 
+    dplyr::mutate(`EXIF:LensInfo` = ifelse((is.na(`EXIF:LensInfo`) | (`EXIF:LensMake` == "Apple")),
                              unlist(Vectorize(create_lensinfo)(`EXIF:LensModel`, FALSE)),
                              `EXIF:LensInfo`)) |> 
-    mutate(`XMP:LensInfo` = `EXIF:LensInfo`) |> 
-    select(-model_new)
+    dplyr::mutate(`XMP:LensInfo` = `EXIF:LensInfo`) |> 
+    dplyr::select(-model_new)
   
   if (lensinfo_only) {
     modify <- modify |> 
-      select(SourceFile, `EXIF:LensInfo`, `XMP:LensInfo`)
+      dplyr::select(SourceFile, `EXIF:LensInfo`, `XMP:LensInfo`)
   }
   
   handle_return(modify, csv_execute, paths, csv_path, delete_original)

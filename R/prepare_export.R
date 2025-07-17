@@ -18,16 +18,14 @@
 #'
 #' @returns nothing
 #' @export
-#'
-#' @examples prepare_export()
 prepare_export <- function(imp_path = "/Volumes/NoBackup/Bilder/Import/2025/", level_below = "1"){
   
   # Write XMP into original files and cleanup ----------------------------------------------------
   # (this needs to be done because ON1 writes NEF file metadata mostly into xmp)
-  exif_call(args = c("-r", "-ext", "nef", "-tagsfromfile", paste0(imp_path, "/%-", level_below, ":d%f.xmp")),
+  exiftoolr::exif_call(args = c("-r", "-ext", "nef", "-tagsfromfile", paste0(imp_path, "/%-", level_below, ":d%f.xmp")),
             path = imp_path)
   system(paste0("find '", imp_path, "' -name '*xmp' -exec rm {} \\;"))
-  exif_call(args = c("-r", "-delete_original!"), path = imp_path)
+  exiftoolr::exif_call(args = c("-r", "-delete_original!"), path = imp_path)
   
   
   # generate file list and run metadata functions ---------------------------
@@ -57,5 +55,5 @@ prepare_export <- function(imp_path = "/Volumes/NoBackup/Bilder/Import/2025/", l
   
   # final cleanup -----------------------------------------------------------
   
-  exif_call(args = c("-r", "-delete_original!"), path = imp_path)
+  exiftoolr::exif_call(args = c("-r", "-delete_original!"), path = imp_path)
 }

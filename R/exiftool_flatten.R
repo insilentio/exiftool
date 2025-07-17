@@ -15,8 +15,6 @@
 #' - if TRUE,  writes the tag values as csv file and writes them via exiftool to pictures
 #' - if FALSE, returns the tags as tibble
 #' @export
-#'
-#' @examples flatten_subject("Test.jpg")
 flatten_subject <- function(paths,
                             csv_execute = TRUE,
                             csv_path = '~/Pictures/subjects.csv',
@@ -24,13 +22,13 @@ flatten_subject <- function(paths,
   
   args <- c("-G", "-s", "-hierarchicalsubject")
   
-  subjects <- exif_read(args = args, path = paths) |> 
-    mutate(subject = lapply(`XMP:HierarchicalSubject`, str_extract, pattern = "([^\\|]+)$")) |> 
-    mutate(subject = lapply(subject, function(x) paste(unlist(x), sep='', collapse=', '))) |>
-    mutate(subject = unlist(subject)) |> 
-    select(SourceFile, subject) |> 
-    mutate(`IPTC:Keywords` = subject) |> 
-    rename(`XMP:Subject` = subject)
+  subjects <- exiftoolr::exif_read(args = args, path = paths) |> 
+    dplyr::mutate(subject = lapply(`XMP:HierarchicalSubject`, stringr::str_extract, pattern = "([^\\|]+)$")) |> 
+    dplyr::mutate(subject = lapply(subject, function(x) paste(unlist(x), sep='', collapse=', '))) |>
+    dplyr::mutate(subject = unlist(subject)) |> 
+    dplyr::select(SourceFile, subject) |> 
+    dplyr::mutate(`IPTC:Keywords` = subject) |> 
+    dplyr::rename(`XMP:Subject` = subject)
   
   handle_return(subjects, csv_execute, paths, csv_path, delete_original, with_sep = ", ")
 }
