@@ -23,6 +23,9 @@ convert35 <- function(paths,
   args <- c("-G", "-s", "-n", "-exif:focallength*", "-exif:model", "-exif:lensmodel")
   exifvalues <- exiftoolr::exif_read(args = args, path = paths)
   
+  if (!any(grepl("FocalLengthIn35mmFormat", colnames(exifvalues))))
+    exifvalues <- exifvalues |> dplyr::mutate(`EXIF:FocalLengthIn35mmFormat` = NA)
+    
   # Real cameras always have the same scaling factor for all lenses, smartphones have different ones
   # per lens. Therefore the mapping table's primary key sometimes consists of 1 column, sometimes of 2.
   # There's no elegant way to do the joining for that reason, so we have to do it in 2 steps and then

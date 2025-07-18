@@ -17,18 +17,18 @@ create_lensinfo <- function(lensmodel, as_tags = TRUE){
   # build proper format
   info <- (if (ncol(typenew) == 2) {
     typenew |> 
-      mutate(V3 = V1, V4 = V2) |> 
-      mutate(V5 = paste(V1, V3, V2, V4)) 
+      dplyr::mutate(V3 = V1, V4 = V2) |> 
+      dplyr::mutate(V5 = paste(V1, V3, V2, V4)) 
   } else if (ncol(typenew) == 3) {
     typenew |> 
-      mutate(V4 = V3) |> 
-      mutate(V5 = paste(V1, V2, V3, V4)) 
+      dplyr::mutate(V4 = V3) |> 
+      dplyr::mutate(V5 = paste(V1, V2, V3, V4)) 
   } else if (ncol(typenew) == 4) {
     typenew |> 
-      mutate(V5 = paste(V1, V2, V3, V4)) 
+      dplyr::mutate(V5 = paste(V1, V2, V3, V4)) 
   }) |> 
-    select(5) |> 
-    pull()
+    dplyr::select(5) |> 
+    dplyr::pull()
   
   # prepare the lens tag
   lenses <- c(paste0("-exif:lensinfo=", info),
@@ -77,14 +77,11 @@ harmonize_lensinfo <- function(paths,
 
   # amend Nikon and Apple lens information
   # means lower case for lensmake and adaptation of lensmodel
-
-  # mapping table
-  mapping <- readr::read_csv("Data/LensMapping.csv")
   
   # change the information by joining the mapping table
   modify <- li |> 
     dplyr::mutate(`EXIF:LensMake` = ifelse(`EXIF:LensMake` == "NIKON", "Nikon", `EXIF:LensMake`)) |> 
-    dplyr::left_join(mapping, by = join_by(`EXIF:LensModel` == model_old)) |> 
+    dplyr::left_join(exifer::lensMapping, by = dplyr::join_by(`EXIF:LensModel` == model_old)) |> 
     dplyr::mutate(`EXIF:LensModel` = ifelse(is.na(model_new), `EXIF:LensModel`, model_new)) |> 
     dplyr::mutate(`XMP:Lens` = `EXIF:LensModel`) |> 
     dplyr::mutate(`EXIF:LensInfo` = ifelse((is.na(`EXIF:LensInfo`) | (`EXIF:LensMake` == "Apple")),
