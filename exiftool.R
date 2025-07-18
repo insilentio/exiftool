@@ -1,7 +1,4 @@
-# file contains various manual code which is being used in the context of metadata cleanup
-
-sapply(list.files("R", pattern = ".*\\.[Rr]", full.names = TRUE), source)
-
+library(exifer)
 
 # default metadata work before and after ON1 export -----------------------
 # select import folder to act upon
@@ -14,10 +11,9 @@ lb <- abs((stringr::str_extract(imported, "\\/(Bilder|Pictures).*") |>
 # run the metadata enrichment stuff before exporting photos from ON1
 prepare_export(imp_path = imported, level_below = lb)
 
-# run the cleanup and metadata enrichment stuff after jpg export from ON1
-# currently needs list of affected export photos from PhotoStatistica!!
-after_export(imp_path = imported)
- 
+  # run the cleanup and metadata enrichment stuff after jpg export from ON1
+after_export(imp_path = imported,
+             exp_path = stringr::str_replace(imported, "Import", "Export/ExportAlbum"))
 
 
 # metadata transfer -------------------------------------------------------
@@ -27,6 +23,24 @@ path_from <- "/Users/Daniel/Pictures/Album/2022/34 - Ausflug Jonduri und Papa/"
 modified_since <- "2025-06-20"
 
 transfer_metadata(path_to, path_from, modified_since, delete_original = TRUE)
+
+
+
+# run updates manually ------------------------------------------------------
+# based on exif-export.csv
+
+paths <- extract_paths() |> 
+  dplyr::pull(full)
+
+flatten_subject(paths)
+harmonize_lensinfo(paths)
+complete_location(paths)
+convert35(paths)
+
+exiftoolr::exif_call(args = c("-r", "-delete_original!"), path = unique(dirname(paths)))
+system(paste0("find '/Volumes/NoBackup/Bilder/Export/ExportAlbum' -name '*xmp' -exec rm {} \\;"))
+system(paste0("find '/Users/Daniel/Pictures/Album' -name '*xmp' -exec rm {} \\;"))
+
 
 # renaming helper ----------------------------------------------------------
 # this renames pictures based on a manually created csv file
@@ -39,16 +53,6 @@ for (i in 1:nrow(naming)){
   
   system(cmd)
 }
-
-
-# call location completer manually ----------------------------------------
-#  (usually via prepare_import)
-complete_location(paths)
-
-
-# flatten keywords --------------------------------------------------------
-#  (usually via prepare_import)
-flatten_subject(paths)
 
 
 
@@ -91,5 +95,3 @@ paths <- extract_paths()
 output_paths(paths)
 
 system("exiftool -@ ~/Pictures/Album/lenses.txt -@ ~/Pictures/paths.txt")
-
-
