@@ -1,4 +1,9 @@
 # Exifer
+<!-- badges: start -->
+
+[![Lifecycle: stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)
+
+<!-- badges: end -->
 
 **Various code to handle image metadata**
 
@@ -23,9 +28,3 @@
     -   *handle_return* takes a tibble of metadata information in exiftool compatible format and either writes it to a csv and executes exiftool on top of it or returns the tibble unchanged.
 
 The package relies heavily on the [exiftoolr](https://github.com/JoshOBrien/exiftoolr) package and thereby on the mighty [exiftool](https://exiftool.org) itself.
-
-<!-- badges: start -->
-
-[![Lifecycle: stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)
-
-<!-- badges: end -->
