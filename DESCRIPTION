@@ -1,7 +1,7 @@
 Package: exifer
 Type: Package
 Title: Photo Metadata Improver
-Version: 1.2.0
+Version: 1.3.0
 Authors@R: c(
     person(
       "Daniel", "Baumgartner",
@@ -10,7 +10,8 @@ Authors@R: c(
     )
   )
 Description: Updates, harmonizes and synchonizes photo metadata with the help of exiftool
-    Continuation lines should be indented.
+    Works closely in conjunction with ON1 and PhotoStatistica to achieve coherent metadata across
+    your photo collection.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
