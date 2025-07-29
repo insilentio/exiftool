@@ -61,7 +61,7 @@ create_lensinfo <- function(lensmodel, as_tags = TRUE){
 #' @export
 harmonize_lensinfo <- function(paths,
                                csv_execute = TRUE,
-                               csv_path = '~/Pictures/subjects.csv',
+                               csv_path = '~/Pictures/lensinfo.csv',
                                delete_original = FALSE,
                                lensinfo_only = FALSE){
   
@@ -79,6 +79,7 @@ harmonize_lensinfo <- function(paths,
   # means lower case for lensmake and adaptation of lensmodel
   
   # change the information by joining the mapping table
+  # for Viltrox (or non-Nikon?) lenses on Zf, lensmake is missing
   modify <- li |> 
     dplyr::mutate(`EXIF:LensMake` = ifelse(`EXIF:LensMake` == "NIKON", "Nikon", `EXIF:LensMake`)) |> 
     dplyr::left_join(exifer::lensMapping, by = dplyr::join_by(`EXIF:LensModel` == model_old)) |> 
@@ -88,6 +89,7 @@ harmonize_lensinfo <- function(paths,
                              unlist(Vectorize(create_lensinfo)(`EXIF:LensModel`, FALSE)),
                              `EXIF:LensInfo`)) |> 
     dplyr::mutate(`XMP:LensInfo` = `EXIF:LensInfo`) |> 
+    dplyr::mutate(`EXIF:LensMake` = ifelse(stringr::str_starts(`EXIF:LensModel`, "Viltrox"), "Viltrox", `EXIF:LensMake`)) |> 
     dplyr::select(-model_new)
   
   if (lensinfo_only) {
