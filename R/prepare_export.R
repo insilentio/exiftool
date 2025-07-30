@@ -50,6 +50,8 @@ prepare_export <- function(imp_path = "/Volumes/NoBackup/Bilder/Import/2025/", l
   # focal length 35mm
   convert35(imported)
   
+  # harmonize time information
+  harmonize_time(imported)
   
   # final cleanup -----------------------------------------------------------
   
