@@ -7,7 +7,7 @@
 harmonize_lensinfo(
   paths,
   csv_execute = TRUE,
-  csv_path = "~/Pictures/subjects.csv",
+  csv_path = "~/Pictures/lensinfo.csv",
   delete_original = FALSE,
   lensinfo_only = FALSE
 )
