@@ -6,7 +6,7 @@
 \alias{exifer-package}
 \title{exifer: Photo Metadata Improver}
 \description{
-Updates, harmonizes and synchonizes photo metadata with the help of exiftool Continuation lines should be indented.
+Updates, harmonizes and synchonizes photo metadata with the help of exiftool Works closely in conjunction with ON1 and PhotoStatistica to achieve coherent metadata across your photo collection.
 }
 \author{
 \strong{Maintainer}: Daniel Baumgartner \email{insilentio@pm.me}
