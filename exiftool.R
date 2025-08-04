@@ -36,6 +36,7 @@ flatten_subject(paths)
 harmonize_lensinfo(paths)
 complete_location(paths)
 convert35(paths)
+harmonize_time(paths)
 
 exiftoolr::exif_call(args = c("-r", "-delete_original!"), path = unique(dirname(paths)))
 system(paste0("find '/Volumes/NoBackup/Bilder/Export/ExportAlbum' -name '*xmp' -exec rm {} \\;"))
