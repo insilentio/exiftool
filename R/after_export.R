@@ -1,8 +1,9 @@
 #' Do after-export work
 #' 
 #' @description Necessary tasks after reading in the previously updated originals and creating the jpg exports from ON1.
-#' - Deletes xmp files in import folder
-#' - runs metadata functions to complete metadata which is missing after export (35mm focal length, lens info).
+
+#' 1. Deletes xmp files in import folder
+#' 2. runs metadata functions to complete metadata which is missing after export (35mm focal length, lens info, keywords).
 #'
 #' @param imp_path the path where the originals lie. Function will remove any xmp in this path
 #' @param exp_path the path where the exported photos lie. If left empty, function expects to find them in exif-export.csv
@@ -30,5 +31,11 @@ after_export <- function(imp_path, exp_path = NULL){
                         full.names = TRUE)
   }
   
-  harmonize_lensinfo(paths, delete_original = TRUE)
+  fs <- flatten_subject(paths, csv_execute = FALSE)
+  hl <- harmonize_lensinfo(paths, csv_execute = FALSE)
+  
+  modify <- fs |> 
+    dplyr::full_join(hl) 
+  
+  handle_return(modify, csv_execute = TRUE, paths = exp_path, csv_path = '~/Pictures/exifer.csv', delete_original = TRUE)
 }

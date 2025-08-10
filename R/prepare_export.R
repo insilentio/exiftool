@@ -9,7 +9,7 @@
 #' 4. amend lens information for Nikon in order to have consistent metadata
 #' 5. amend lens information for Apple in order to have prime/zoom lens info consistent
 #' 6. ensures completeness of location tags information
-#' 7. cleanup
+#' 7. harmonize createtime and datetimeoriginal information
 #'
 #' @param imp_path current import path to work on. The number of subordinate directory levels is indicated
 #' by the parameter 'level_below'.
@@ -44,13 +44,8 @@ prepare_export <- function(imp_path = "/Volumes/NoBackup/Bilder/Import/2025/", l
   # lens information
   hl <- harmonize_lensinfo(imported, csv_execute = FALSE)
   
-  
   # complete the information in the various location tags
   cl <- complete_location(imported, csv_execute = FALSE)
-
-  
-  # focal length 35mm
-  # c3 <- convert35(imported, csv_execute = FALSE)
   
   # harmonize time information
   ht <- harmonize_time(imported, csv_execute = FALSE)

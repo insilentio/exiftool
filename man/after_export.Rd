@@ -16,8 +16,8 @@ nothing
 }
 \description{
 Necessary tasks after reading in the previously updated originals and creating the jpg exports from ON1.
-\itemize{
+\enumerate{
 \item Deletes xmp files in import folder
-\item runs metadata functions to complete metadata which is missing after export (35mm focal length, lens info).
+\item runs metadata functions to complete metadata which is missing after export (35mm focal length, lens info, keywords).
 }
 }
