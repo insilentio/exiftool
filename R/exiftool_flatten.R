@@ -2,7 +2,8 @@
 #' 
 #' @description Write flat keywords and subject tags derived from hierarchical ones (tag XMP:HierarchicalSubject)
 #' into photo metadata. Only writes the lowest level keywords back to the pictures. Hierarchical keyword tag is not modified. 
-#' Also deals with rating: aligns EXIF and XMP values and sets an additional keyword for Apples Photo App in order to deal with the non-existing ratings there
+#' Also deals with rating: aligns EXIF and XMP values and sets an additional keyword for Apples Photo App;
+#' in order to deal with the non-existing ratings there - but only for export photos.
 #' (There is no metadata flag for Apples favourites -> must be set manually based on this keyword).
 #' It uses per default the csv option of exifool to handle different values for different files,
 #' which is much faster than a for loop which calls exiftool every time.
@@ -34,7 +35,8 @@ flatten_subject <- function(paths,
   subjects <- tibble::tibble(subjects) |> 
     dplyr::mutate(rating = ifelse(is.na(`EXIF:Rating`), `XMP:Rating`, `EXIF:Rating`)) |>
     dplyr::mutate(subject = lapply(`XMP:HierarchicalSubject`, stringr::str_extract, pattern = "([^\\|]+)$")) |> 
-    dplyr::mutate(subject = ifelse(rating >= 4, lapply(subject, c, "Apple-Favourite"), subject)) |> 
+    dplyr::mutate(isExport = stringr::str_detect(SourceFile, "Export")) |> 
+    dplyr::mutate(subject = ifelse(rating >= 4 & isExport, lapply(subject, c, "Apple-Favourite"), subject)) |> 
     dplyr::mutate(subject = lapply(subject, function(x) paste(unlist(x), sep='', collapse=', '))) |>
     dplyr::mutate(subject = unlist(subject)) |> 
     dplyr::select(SourceFile, subject, rating) |>
