@@ -30,7 +30,8 @@ depending on param csv_execute:
 \description{
 Write flat keywords and subject tags derived from hierarchical ones (tag XMP:HierarchicalSubject)
 into photo metadata. Only writes the lowest level keywords back to the pictures. Hierarchical keyword tag is not modified.
-Also deals with rating: aligns EXIF and XMP values and sets an additional keyword for Apples Photo App in order to deal with the non-existing ratings there
+Also deals with rating: aligns EXIF and XMP values and sets an additional keyword for Apples Photo App;
+in order to deal with the non-existing ratings there - but only for export photos.
 (There is no metadata flag for Apples favourites -> must be set manually based on this keyword).
 It uses per default the csv option of exifool to handle different values for different files,
 which is much faster than a for loop which calls exiftool every time.
