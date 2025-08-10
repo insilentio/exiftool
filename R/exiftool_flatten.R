@@ -34,9 +34,9 @@ flatten_subject <- function(paths,
   subjects <- tibble::tibble(subjects) |> 
     dplyr::mutate(rating = ifelse(is.na(`EXIF:Rating`), `XMP:Rating`, `EXIF:Rating`)) |>
     dplyr::mutate(subject = lapply(`XMP:HierarchicalSubject`, stringr::str_extract, pattern = "([^\\|]+)$")) |> 
+    dplyr::mutate(subject = ifelse(rating >= 4, lapply(subject, c, "Apple-Favourite"), subject)) |> 
     dplyr::mutate(subject = lapply(subject, function(x) paste(unlist(x), sep='', collapse=', '))) |>
     dplyr::mutate(subject = unlist(subject)) |> 
-    dplyr::mutate(subject = ifelse(rating >= 4, paste0(subject, ", Apple-Favourite"), subject)) |> 
     dplyr::select(SourceFile, subject, rating) |>
     dplyr::mutate(`IPTC:Keywords` = subject,
                   `EXIF:Rating` = rating) |> 
