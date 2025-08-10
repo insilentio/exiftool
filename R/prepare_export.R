@@ -35,25 +35,30 @@ prepare_export <- function(imp_path = "/Volumes/NoBackup/Bilder/Import/2025/", l
                          recursive = TRUE,
                          full.names = TRUE)
   
-  # flatten hierarchical keywords
-  flatten_subject(imported)
+  # the metadata functions can be run without writing the metadata already. This is better for performance, 
+  # because we can execute the time consuming exiftool command only once.
   
+  # flatten hierarchical keywords
+  fs <- flatten_subject(imported, csv_execute = FALSE)
   
   # lens information
-  harmonize_lensinfo(imported)
+  hl <- harmonize_lensinfo(imported, csv_execute = FALSE)
   
   
   # complete the information in the various location tags
-  complete_location(imported)
+  cl <- complete_location(imported, csv_execute = FALSE)
 
   
   # focal length 35mm
-  convert35(imported)
+  # c3 <- convert35(imported, csv_execute = FALSE)
   
   # harmonize time information
-  harmonize_time(imported)
+  ht <- harmonize_time(imported, csv_execute = FALSE)
   
-  # final cleanup -----------------------------------------------------------
+  modify <- fs |> 
+    dplyr::full_join(hl) |> 
+    dplyr::full_join(cl) |> 
+    dplyr::full_join(ht)
   
-  exiftoolr::exif_call(args = c("-r", "-delete_original!"), path = imp_path)
+  handle_return(modify, csv_execute = TRUE, paths = imported, csv_path = '~/Pictures/exifer.csv', delete_original = TRUE)
 }
