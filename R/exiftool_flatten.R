@@ -2,6 +2,8 @@
 #' 
 #' @description Write flat keywords and subject tags derived from hierarchical ones (tag XMP:HierarchicalSubject)
 #' into photo metadata. Only writes the lowest level keywords back to the pictures. Hierarchical keyword tag is not modified. 
+#' Also deals with rating: aligns EXIF and XMP values and sets an additional keyword for Apples Photo App in order to deal with the non-existing ratings there
+#' (There is no metadata flag for Apples favourites -> must be set manually based on this keyword).
 #' It uses per default the csv option of exifool to handle different values for different files,
 #' which is much faster than a for loop which calls exiftool every time.
 #' Exiftool per default creates copies of the original files (*_original); this behaviour can be modified by parameter.
@@ -20,15 +22,27 @@ flatten_subject <- function(paths,
                             csv_path = '~/Pictures/subjects.csv',
                             delete_original = FALSE){
   
-  args <- c("-G", "-s", "-hierarchicalsubject")
+  args <- c("-G", "-s", "-hierarchicalsubject", "-rating")
   
-  subjects <- exiftoolr::exif_read(args = args, path = paths) |> 
+  subjects <- exiftoolr::exif_read(args = args, path = paths) 
+  
+  if (!any(grepl("XMP:Rating", colnames(subjects))))
+    subjects <- subjects |> dplyr::mutate(`XMP:Rating` = NA)
+  if (!any(grepl("EXIF:Rating", colnames(subjects))))
+    subjects <- subjects |> dplyr::mutate(`EXIF:Rating` = NA)
+
+  subjects <- tibble::tibble(subjects) |> 
+    dplyr::mutate(rating = ifelse(is.na(`EXIF:Rating`), `XMP:Rating`, `EXIF:Rating`)) |>
     dplyr::mutate(subject = lapply(`XMP:HierarchicalSubject`, stringr::str_extract, pattern = "([^\\|]+)$")) |> 
     dplyr::mutate(subject = lapply(subject, function(x) paste(unlist(x), sep='', collapse=', '))) |>
     dplyr::mutate(subject = unlist(subject)) |> 
-    dplyr::select(SourceFile, subject) |> 
-    dplyr::mutate(`IPTC:Keywords` = subject) |> 
-    dplyr::rename(`XMP:Subject` = subject)
+    dplyr::mutate(subject = ifelse(rating >= 4, paste0(subject, ", Apple-Favourite"), subject)) |> 
+    dplyr::select(SourceFile, subject, rating) |>
+    dplyr::mutate(`IPTC:Keywords` = subject,
+                  `EXIF:Rating` = rating) |> 
+    dplyr::rename(`XMP:Subject` = subject,
+                  `XMP:Rating` = rating)
+  
   
   handle_return(subjects, csv_execute, paths, csv_path, delete_original, with_sep = ", ")
 }

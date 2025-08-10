@@ -30,6 +30,5 @@ after_export <- function(imp_path, exp_path = NULL){
                         full.names = TRUE)
   }
   
-  convert35(paths)
   harmonize_lensinfo(paths, delete_original = TRUE)
 }
