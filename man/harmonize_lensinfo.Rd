@@ -34,6 +34,7 @@ depending on param csv_execute:
 Writes various lens information tags obtained from a mapping table (LensMapping.csv) and existing metadata
 into photo metadata. LensInfo is created dynamically and can be written separately by the according parameter
 (this is often necessary because programs omit this information which is relevant for prime/zoom differentiation).
+It also adds the 35mm equivalent focal length which relies on a hardcoded mapping table (CropFactor.csv).
 It uses per default the csv option of exifool to handle different values for different files,
 which is much faster than a for loop which calls exiftool every time
 }

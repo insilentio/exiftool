@@ -47,7 +47,7 @@ output_paths <- function(paths,
 #' @returns depending on param csv_execute:
 #' - if TRUE,  writes the tag values as csv file and writes them via exiftool to pictures
 #' - if FALSE, returns the tags as tibble
-#'
+#' @export
 handle_return <- function(df, csv_execute, paths, csv_path, delete_original, with_sep = NULL) {
   
   if (is.null(with_sep))

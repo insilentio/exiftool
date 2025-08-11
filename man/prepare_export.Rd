@@ -29,6 +29,6 @@ in Import folder after Development work in ON1 and before Export
 \item amend lens information for Nikon in order to have consistent metadata
 \item amend lens information for Apple in order to have prime/zoom lens info consistent
 \item ensures completeness of location tags information
-\item cleanup
+\item harmonize createtime and datetimeoriginal information
 }
 }

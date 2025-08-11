@@ -45,7 +45,8 @@ create_lensinfo <- function(lensmodel, as_tags = TRUE){
 #' 
 #' @description Writes various lens information tags obtained from a mapping table (LensMapping.csv) and existing metadata
 #' into photo metadata. LensInfo is created dynamically and can be written separately by the according parameter
-#' (this is often necessary because programs omit this information which is relevant for prime/zoom differentiation). 
+#' (this is often necessary because programs omit this information which is relevant for prime/zoom differentiation).
+#' It also adds the 35mm equivalent focal length which relies on a hardcoded mapping table (CropFactor.csv).
 #' It uses per default the csv option of exifool to handle different values for different files,
 #' which is much faster than a for loop which calls exiftool every time
 #'
@@ -65,7 +66,7 @@ harmonize_lensinfo <- function(paths,
                                delete_original = FALSE,
                                lensinfo_only = FALSE){
   
-  args <- c("-G", "-s", "-n", "-lensinfo", "-lensmodel", "-lens", "-lensmake")
+  args <- c("-G", "-s", "-n", "-lensinfo", "-lensmodel", "-XMP:lens", "-lensmake", "-exif:focallength*", "-exif:model")
 
   # read only metadata of photos where LensModel is known
   li <- exiftoolr::exif_read(args = args, path = paths) |> 
@@ -96,6 +97,38 @@ harmonize_lensinfo <- function(paths,
     modify <- modify |> 
       dplyr::select(SourceFile, `EXIF:LensInfo`, `XMP:LensInfo`)
   }
+  
+
+# 35mm equivalent focallength ---------------------------------------------
+  
+  if (!any(grepl("FocalLengthIn35mmFormat", colnames(modify))))
+    modify <- modify |> dplyr::mutate(`EXIF:FocalLengthIn35mmFormat` = NA)
+  
+  # Real cameras always have the same scaling factor for all lenses, smartphones have different ones
+  # per lens. Therefore the mapping table's primary key sometimes consists of 1 column, sometimes of 2.
+  # There's no elegant way to do the joining for that reason, so we have to do it in 2 steps and then
+  # merge it together.
+  focallength_1 <- modify |> 
+    dplyr::rename(fl35Original = `EXIF:FocalLengthIn35mmFormat`) |> 
+    dplyr::left_join(exifer::cropFactor,
+                     by = dplyr::join_by("EXIF:Model" == "model", "EXIF:LensModel" == "lensmodel"))
+  focallength_2 <- focallength_1 |> 
+    dplyr::filter(is.na(factor)) |> 
+    dplyr::select(SourceFile, `EXIF:FocalLength`, fl35Original, `EXIF:Model`, `EXIF:LensModel`) |> 
+    dplyr::left_join(exifer::cropFactor |> dplyr::select(-lensmodel),
+                     by = dplyr::join_by("EXIF:Model" == "model"))
+  
+  focallength <- focallength_1 |> 
+    dplyr::filter(!is.na(factor)) |> 
+    dplyr::add_row(focallength_2) |> 
+    dplyr::mutate(`EXIF:FocalLengthIn35mmFormat` = ifelse(is.na(fl35Original),
+                                                          floor(`EXIF:FocalLength`*factor),
+                                                          fl35Original)) |> 
+    dplyr::select(SourceFile, `EXIF:FocalLengthIn35mmFormat`)
+  
+  modify <- modify |> 
+    dplyr::select(-`EXIF:FocalLengthIn35mmFormat`) |> 
+    dplyr::left_join(focallength)
   
   handle_return(modify, csv_execute, paths, csv_path, delete_original)
 }

@@ -26,12 +26,7 @@ complete_location <- function(paths,
                   "XMP:State", "IPTC:Province-State", 
                   "XMP:Country", "IPTC:Country-PrimaryLocationName")
   args <- c("-G", "-s",
-            paste0("-", req_columns[2]),
-            paste0("-", req_columns[3]),
-            paste0("-", req_columns[4]),
-            paste0("-", req_columns[5]),
-            paste0("-", req_columns[6]),
-            paste0("-", req_columns[7]))
+            paste0("-", req_columns[2:8]))
   locations <- exiftoolr::exif_read(args = args, path = paths)
   
   # check if one of the desired tags is completely missing and add it if necessary

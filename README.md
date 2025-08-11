@@ -1,4 +1,5 @@
 # Exifer
+
 <!-- badges: start -->
 
 [![Lifecycle: stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)
@@ -13,6 +14,7 @@
     -   *flatten_subject* creates flat keywords and subject tags from hierarchical ones
     -   *harmonize_lensinfo* creates harmonized lens model and other lens information based on a mapping table
     -   *create_lensinfo* creates the values for the lens info tag based on lens model, which is used for prime \<-\> zoom differentiation
+    -   *harmonize_time* sets the time flags coherently
 
 -   *after_export* handles all metadata work on exported jpg photos from ON1. It uses partially the same subfunctions as above:
 
