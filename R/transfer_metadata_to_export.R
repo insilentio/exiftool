@@ -43,25 +43,22 @@ transfer_metadata <- function(path_to,
     dplyr::mutate(match = paste0(dir_from, name_from)) |>
     dplyr::mutate(match = stringr::str_sub(match, 1, nchar(match) - 4)) 
   
-  # make sure that you get the expected sizes for each dataframe
-  # for a complete transfer, files_to and files_from need to be the same size!
-  # check also with these helpers for duplicates etc.:
+  # make sure that you get the expected sizes for each dataframe (not necessarily the same!)
+  # check with these helpers for duplicates and ensure for every files_from there is also a file_to present:
   if (!ignore_warnings) {
     stopifnot(exprs = {
       files_to |> 
         dplyr::group_by(match) |> 
-        dplyr::filter(n() > 1) |> 
+        dplyr::filter(dplyr::n() > 1) |> 
         nrow() == 0
       
       files_from |> 
         dplyr::group_by(match) |> 
-        dplyr::filter(n() > 1) |> 
+        dplyr::filter(dplyr::n() > 1) |> 
         nrow() == 0
       
-      files_to |> 
-        dplyr::anti_join(files_from, by = "match") |> 
-        dplyr::select(match) |> 
-        nrow() == 0
+      nrow(files_from) == nrow(files_to |>
+                                 dplyr::inner_join(files_from, by = "match"))
     }
     )
   }
