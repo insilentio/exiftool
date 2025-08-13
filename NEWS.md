@@ -1,5 +1,7 @@
 # exifer 1.5.5
 
+-   introduced github workflow for automatic release
+
 # exifer 1.5.4
 
 -   bugfix in transfer_metadata():
