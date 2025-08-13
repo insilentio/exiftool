@@ -5,3 +5,4 @@
 exiftool.R
 ^LICENSE\.md$
 inst/extdata/DATASET.R
+^\.github$
