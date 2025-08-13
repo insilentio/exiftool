@@ -18,8 +18,7 @@
 
 -   *after_export* handles all metadata work on exported jpg photos from ON1. It uses partially the same subfunctions as above:
 
-    -   *harmonize_lensinfo* creates harmonized lens model and other lens information based on a mapping table
-    -   *convert35* adds the 35mm equivalent focal length based on a mapping table
+    -   *harmonize_lensinfo* creates harmonized lens model and other lens information based on a mapping table, including 35mm focal equivalence
 
 -   *transfer_metadata* allows to find matching photos in different directories; mainly in Export Album compared to original album. Updates the target photos with all metadata from originals.
 
