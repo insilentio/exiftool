@@ -1,7 +1,7 @@
 name: Create release
 
 on:
-  push:
+  pull_request:
     branch:
       - "master"
     tags:
