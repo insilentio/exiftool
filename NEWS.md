@@ -1,3 +1,5 @@
+# exifer 1.5.5
+
 # exifer 1.5.4
 
 -   bugfix in transfer_metadata():
