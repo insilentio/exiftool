@@ -71,7 +71,7 @@ transfer_metadata <- function(path_to,
     args <- c("-exif:all=", "-xmp:all=", "-iptc:all=", "-iptcdigest=", "-tagsfromfile", files$path_from[i],
               "-exif:all", "-xmp:all", "-iptc:all", "--on1ref", "--orientation", "-makernotes:all=", "-m")
     if (delete_original)
-      args <- c(args, "-delete_original")
+      args <- c(args, "-overwrite_original")
     
     exiftoolr::exif_call(args = args, path = files$path_to[i])
   }

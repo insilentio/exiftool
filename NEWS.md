@@ -1,3 +1,13 @@
+# exifer 1.5.6
+
+-   bugfix in transfer_metadata():
+
+    the delete_original param for exiftool was wrong (should be overwrite_original)
+
+# exifer 1.5.5
+
+-   introduced github workflow for automatic release
+
 # exifer 1.5.4
 
 -   bugfix in transfer_metadata():
