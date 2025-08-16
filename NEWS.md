@@ -1,3 +1,5 @@
+# exifer 1.5.8
+
 # exifer 1.5.7
 
 -   bugfixes in prepare_export():
