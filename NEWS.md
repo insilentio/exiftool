@@ -1,5 +1,7 @@
 # exifer 1.5.8
 
+-   added a iPhone 13 mini lens to mapping table
+
 # exifer 1.5.7
 
 -   bugfixes in prepare_export():
