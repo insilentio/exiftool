@@ -11,7 +11,7 @@
 #' @returns nothing
 #' @export
 after_export <- function(imp_path, exp_path = NULL){
-  if (is.null(exp_path)){d
+  if (is.null(exp_path)){
     if (!rstudioapi::showQuestion(title = "Exif_export", message="exif-export.csv generated?")) {
       stop("Aborted, please create exif_export.csv first or provide export path")
     }
