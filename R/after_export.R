@@ -37,5 +37,10 @@ after_export <- function(imp_path, exp_path = NULL){
   modify <- fs |> 
     dplyr::full_join(hl) 
   
-  handle_return(modify, csv_execute = TRUE, paths = exp_path, csv_path = '~/Pictures/exifer.csv', delete_original = TRUE)
+  handle_return(modify, 
+                csv_execute = TRUE, 
+                paths = exp_path, 
+                csv_path = '~/Pictures/exifer.csv', 
+                delete_original = TRUE,
+                with_sep = ", ")
 }
