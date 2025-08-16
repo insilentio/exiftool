@@ -1,3 +1,9 @@
+# exifer 1.5.7
+
+-   bugfixes in prepare_export():
+    -   double qouting the system command with `find`
+    -   added parameter for correct separation of keywords
+
 # exifer 1.5.6
 
 -   bugfix in transfer_metadata():
