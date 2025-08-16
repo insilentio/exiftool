@@ -11,14 +11,14 @@
 #' @returns nothing
 #' @export
 after_export <- function(imp_path, exp_path = NULL){
-  if (is.null(exp_path)){
+  if (is.null(exp_path)){d
     if (!rstudioapi::showQuestion(title = "Exif_export", message="exif-export.csv generated?")) {
       stop("Aborted, please create exif_export.csv first or provide export path")
     }
   }
 
   # ON1 generates new xmp upon "read metadata from photo" in the previous step, let's delete them again
-  system(paste0("find '", imp_path, "' -name '*xmp' -exec rm {} \\;"))
+  system(paste0('find "', imp_path, '" -name "*xmp" -exec rm {} \\;'))
   
   # ON1 does not export 35mm focal length info nor lens type, must be added after jpg generation
   if (is.null(exp_path)) {
