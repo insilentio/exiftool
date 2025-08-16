@@ -23,19 +23,24 @@ after_export <- function(imp_path, exp_path = NULL){
   # ON1 does not export 35mm focal length info nor lens type, must be added after jpg generation
   if (is.null(exp_path)) {
     # -> generate the list of affected files first in Photo Statistica
-    paths <- extract_paths() |> 
+    exported <- extract_paths() |> 
       dplyr::pull(full)
   } else {
-    paths <- list.files(exp_path,
+    exported <- list.files(exp_path,
                         recursive = TRUE,
                         full.names = TRUE)
   }
   
-  fs <- flatten_subject(paths, csv_execute = FALSE)
-  hl <- harmonize_lensinfo(paths, csv_execute = FALSE)
+  fs <- flatten_subject(exported, csv_execute = FALSE)
+  hl <- harmonize_lensinfo(exported, csv_execute = FALSE)
   
   modify <- fs |> 
     dplyr::full_join(hl) 
   
-  handle_return(modify, csv_execute = TRUE, paths = exp_path, csv_path = '~/Pictures/exifer.csv', delete_original = TRUE)
+  handle_return(modify, 
+                csv_execute = TRUE, 
+                paths = exported, 
+                csv_path = '~/Pictures/exifer.csv', 
+                delete_original = TRUE,
+                with_sep = ", ")
 }
