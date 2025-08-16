@@ -1,3 +1,7 @@
+# exifer 1.5.9
+
+-   same as v1.5.7-8 but for after export and cropfactor
+
 # exifer 1.5.8
 
 -   added a iPhone 13 mini lens to mapping table
