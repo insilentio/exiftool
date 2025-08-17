@@ -1,3 +1,7 @@
+# exifer 1.5.11
+
+-   added crop factor information for Nikon D7200
+
 # exifer 1.5.10
 
 -   bugfix `after_export()`:
