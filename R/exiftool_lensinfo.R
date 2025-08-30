@@ -82,7 +82,6 @@ harmonize_lensinfo <- function(paths,
   # change the information by joining the mapping table
   # for Viltrox (or non-Nikon?) lenses on Zf, lensmake is missing
   modify <- li |> 
-    dplyr::mutate(`EXIF:LensMake` = ifelse(`EXIF:LensMake` == "NIKON", "Nikon", `EXIF:LensMake`)) |> 
     dplyr::left_join(exifer::lensMapping, by = dplyr::join_by(`EXIF:LensModel` == model_old)) |> 
     dplyr::mutate(`EXIF:LensModel` = ifelse(is.na(model_new), `EXIF:LensModel`, model_new)) |> 
     dplyr::mutate(`XMP:Lens` = `EXIF:LensModel`) |> 
@@ -90,7 +89,9 @@ harmonize_lensinfo <- function(paths,
                              unlist(Vectorize(create_lensinfo)(`EXIF:LensModel`, FALSE)),
                              `EXIF:LensInfo`)) |> 
     dplyr::mutate(`XMP:LensInfo` = `EXIF:LensInfo`) |> 
+    dplyr::mutate(`EXIF:LensMake` = ifelse(`EXIF:LensMake` == "NIKON", "Nikon", `EXIF:LensMake`)) |> 
     dplyr::mutate(`EXIF:LensMake` = ifelse(stringr::str_starts(`EXIF:LensModel`, "Viltrox"), "Viltrox", `EXIF:LensMake`)) |> 
+    dplyr::mutate(`EXIF:LensMake` = ifelse(stringr::str_starts(`EXIF:LensModel`, "Sigma"), "Sigma", `EXIF:LensMake`)) |> 
     dplyr::select(-model_new)
   
   if (lensinfo_only) {

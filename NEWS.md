@@ -1,3 +1,7 @@
+# exifer 1.5.12
+
+-   added Sigma 150-600mm to lens mapping database
+
 # exifer 1.5.11
 
 -   added crop factor information for Nikon D7200
