@@ -9,6 +9,7 @@
 #' @param csv_execute logical, to determine whether modification should be directly written or returned as tibble
 #' @param csv_path path and file name of the output csv file
 #' @param delete_original whether the original copies of the photos should be deleted afterwards or not
+#' @param offset the timezone offset in hours (compared to UTC)
 #'
 #' @returns depending on param csv_execute:
 #' - if TRUE,  writes the tag values as csv file and writes them via exiftool to pictures
@@ -18,9 +19,11 @@ harmonize_time <- function(paths,
                            csv_execute = TRUE,
                            csv_path = '~/Pictures/time.csv',
                            delete_original = FALSE,
-                           offset = "+02:00"){
+                           offset){
   
   args <- c("-G", "-s", "-n", "-e", "-time:all", "--makernotes:all", "--file:all", "-exif:make")
+  
+  offset <- convert_hours(offset)
   
   times <- exiftoolr::exif_read(args = args, path = paths)
   

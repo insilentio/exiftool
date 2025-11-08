@@ -15,10 +15,14 @@
 #' by the parameter 'level_below'.
 #' @param level_below indicates to which directory level relative to imp_path it is looking for xmp files and
 #' therefore may need to be changed (e.g. on year level -> 2, on album level -> 3)
+#' @param offset the number of hours of offset of the timezone the photos were taken in compared to UTC.
+#' 1 for MEZ, 2 for MESZ  
 #'
 #' @returns nothing
 #' @export
-prepare_export <- function(imp_path = "/Volumes/NoBackup/Bilder/Import/2025/", level_below = "1") {
+prepare_export <- function(imp_path = "/Volumes/NoBackup/Bilder/Import/2025/",
+                           level_below = "1",
+                           offset) {
   # Write XMP into original files and cleanup ----------------------------------------------------
   # (this needs to be done because ON1 writes NEF file metadata mostly into xmp)
   exiftoolr::exif_call(

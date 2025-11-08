@@ -67,3 +67,24 @@ handle_return <- function(df, csv_execute, paths, csv_path, delete_original, wit
     df
   }
 }
+
+
+#' Time format conversion
+#' 
+#' @description
+#' creates the time format used in Exiftool for Offsets (e.g. "+01:00")
+#' 
+#'
+#' @param hours usually the offset of the timezone compared to UTC; a number
+#'
+#' @returns the input parameter in the pre-defined output format
+#' @export
+convert_hours <- function(hours){
+  int <- format(paste0("0", hours %/% 1), width = 2, justify = "r")
+  float <- format(paste0("0", hours %% 1 * 60), width = 2, justify = "r")
+  sign <- ifelse(hours > 0, "+", "-")
+  
+  paste0(sign, int, ":", float) 
+}
+
+
