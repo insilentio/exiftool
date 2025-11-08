@@ -2,6 +2,7 @@
 
 export(after_export)
 export(complete_location)
+export(convert_hours)
 export(create_lensinfo)
 export(extract_paths)
 export(flatten_subject)

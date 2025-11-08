@@ -1,3 +1,9 @@
+# exifer 1.6.0
+
+-   added time harmonization functionality for iphone pix (offsets etc.) in `exiftool_time()`
+-   additional parameter for offset in `prepare_export()`
+-   new helper function `convert_hours()` (for offsets)
+
 # exifer 1.5.12
 
 -   added Sigma 150-600mm to lens mapping database

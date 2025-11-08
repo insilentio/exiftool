@@ -1,7 +1,7 @@
 Package: exifer
 Type: Package
 Title: Photo Metadata Improver
-Version: 1.5.12
+Version: 1.6.0
 Authors@R: c(
     person(
       "Daniel", "Baumgartner",
@@ -24,7 +24,7 @@ Imports:
     rstudioapi,
     stringr,
     tibble
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3
 Roxygen: list(markdown = TRUE)
 Suggests: 
     testthat (>= 3.0.0)
