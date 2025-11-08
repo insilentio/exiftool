@@ -17,19 +17,43 @@
 harmonize_time <- function(paths,
                            csv_execute = TRUE,
                            csv_path = '~/Pictures/time.csv',
-                           delete_original = FALSE){
+                           delete_original = FALSE,
+                           offset = "+02:00"){
   
-  args <- c("-G", "-s", "-n", "-time:all")
+  args <- c("-G", "-s", "-n", "-e", "-time:all", "--makernotes:all", "--file:all", "-exif:make")
   
   times <- exiftoolr::exif_read(args = args, path = paths)
   
-  # check if the dto tag is completely missing and add it if necessary
-  if (!"EXIF:DateTimeOriginal" %in% colnames(times))
+  # check if some tags are completely missing and add them if necessary
+  if (!any(grepl("EXIF:DateTimeOriginal", colnames(times))))
     times <- times |> tibble::add_column("EXIF:DateTimeOriginal" = NA)
+  if (!any(grepl("IPTC:TimeCreated", colnames(times))))
+    times <- times |> tibble::add_column("IPTC:TimeCreated" = NA)
+  if (!any(grepl("IPTC:DateCreated", colnames(times))))
+    times <- times |> tibble::add_column("IPTC:DateCreated" = NA)
   
   times <- times |> 
     dplyr::mutate(`EXIF:DateTimeOriginal` = `EXIF:CreateDate`) |> 
-    dplyr::select(SourceFile, `EXIF:DateTimeOriginal`)
+    dplyr::mutate(`XMP:DateTimeOriginal` = `EXIF:CreateDate`) |> 
+    dplyr::mutate(`IPTC:TimeCreated` = "") |> 
+    dplyr::mutate(`IPTC:DateCreated` = "")
   
+  # for iPhone pictures, we need to rewrite some time values to get proper order in the various tools.
+  times_iphone <- times |> 
+    dplyr::filter(`EXIF:Make` == "Apple") |> 
+    dplyr::mutate(`XMP:CreateDate` = `EXIF:CreateDate`) |> 
+    dplyr::mutate(`EXIF:OffsetTime` = offset) |> 
+    dplyr::mutate(`EXIF:OffsetTimeOriginal` = offset) |> 
+    dplyr::mutate(`EXIF:OffsetTimeDigitized` = offset)
+  
+  # combine the iPhone ond non-iPhone pix
+  times <- times |> 
+    dplyr::filter(`EXIF:Make` != "Apple") |> 
+    dplyr::add_row(times_iphone) |> 
+    dplyr::select(SourceFile, `EXIF:DateTimeOriginal`, `EXIF:CreateDate`, `EXIF:OffsetTime`,
+                  `EXIF:OffsetTimeOriginal`, `EXIF:OffsetTimeDigitized`, `XMP:DateTimeOriginal`,
+                  `XMP:CreateDate`, `IPTC:TimeCreated`, `IPTC:DateCreated`)
+  
+
   handle_return(times, csv_execute, paths, csv_path, delete_original)
 }
