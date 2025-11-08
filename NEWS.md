@@ -1,3 +1,6 @@
+# exifer 1.6.1
+-   bugfix offset
+
 # exifer 1.6.0
 
 -   added time harmonization functionality for iphone pix (offsets etc.) in `exiftool_time()`
