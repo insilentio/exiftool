@@ -1,3 +1,5 @@
+# exifer 1.6.0
+
 # exifer 1.5.12
 
 -   added Sigma 150-600mm to lens mapping database
