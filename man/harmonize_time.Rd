@@ -8,7 +8,8 @@ harmonize_time(
   paths,
   csv_execute = TRUE,
   csv_path = "~/Pictures/time.csv",
-  delete_original = FALSE
+  delete_original = FALSE,
+  offset
 )
 }
 \arguments{
@@ -19,6 +20,8 @@ harmonize_time(
 \item{csv_path}{path and file name of the output csv file}
 
 \item{delete_original}{whether the original copies of the photos should be deleted afterwards or not}
+
+\item{offset}{the timezone offset in hours (compared to UTC)}
 }
 \value{
 depending on param csv_execute:
