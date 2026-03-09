@@ -1,3 +1,6 @@
+# exifer 1.6.2
+-   bugfix issue with `EXIF:OffsetTimeDigitized`
+
 # exifer 1.6.1
 -   bugfix offset
 
