@@ -50,13 +50,11 @@ harmonize_time <- function(paths,
     dplyr::mutate(`EXIF:OffsetTimeDigitized` = offset)
   
   # combine the iPhone ond non-iPhone pix
-  times <- times |> 
-    dplyr::filter(`EXIF:Make` != "Apple") |> 
-    dplyr::add_row(times_iphone) |> 
+  times <- times_iphone |> 
+    dplyr::add_row(times |>  dplyr::filter(`EXIF:Make` != "Apple")) |> 
     dplyr::select(SourceFile, `EXIF:DateTimeOriginal`, `EXIF:CreateDate`, `EXIF:OffsetTime`,
                   `EXIF:OffsetTimeOriginal`, `EXIF:OffsetTimeDigitized`, `XMP:DateTimeOriginal`,
                   `XMP:CreateDate`, `IPTC:TimeCreated`, `IPTC:DateCreated`)
-  
 
   handle_return(times, csv_execute, paths, csv_path, delete_original)
 }
