@@ -34,6 +34,8 @@ harmonize_time <- function(paths,
     times <- times |> tibble::add_column("IPTC:TimeCreated" = NA)
   if (!any(grepl("IPTC:DateCreated", colnames(times))))
     times <- times |> tibble::add_column("IPTC:DateCreated" = NA)
+  if (!any(grepl("EXIF:CreateDate", colnames(times))))
+    times <- times |> dplyr::mutate(`EXIF:CreateDate` = `EXIF:DateTimeOriginal`)
   
   times <- times |> 
     dplyr::mutate(`EXIF:DateTimeOriginal` = `EXIF:CreateDate`) |> 
