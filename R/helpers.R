@@ -57,8 +57,17 @@ handle_return <- function(df, csv_execute, paths, csv_path, delete_original, wit
   
   if (csv_execute){
     loc_path <- normalizePath(csv_path, mustWork = FALSE)
-    df |> readr::write_csv(loc_path)
+    # missing values in R are obviously represented by NAs; in the metadata, this is different: missing values
+    # are represented by completely skipping the respective tag. This is achieved by handing empty strings to exiftool
+    df |> 
+      readr::write_csv(loc_path, na = "")
     
+    # ON1 has really grave problems with metadata management. E.g. it doesn't write the Subject tag properly, which cuases
+    # a loooot of warnings by exiftool. Hence, if Subject is part of the update, we delete it first with warning suppression
+    if ("XMP:Subject" %in% colnames(df))
+      exiftoolr::exif_call(args = c("-XMP:Subject=", "-m"), path = paths)
+    
+    # now run exiftool on the metadata that was wrritten into the csv
     exiftoolr::exif_call(args = c("-f", paste0("-csv=", loc_path)), common_args = sep, path = paths)
     
     if (delete_original)

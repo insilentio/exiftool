@@ -1,3 +1,9 @@
+# exifer 1.6.4
+- bugfix problem with NA values in location and other tags
+- fix warning issues when updating subject tag
+- fix warning issues for joins
+- updated packages
+
 # exifer 1.6.3
 -  bugfix issue with `EXIF:CreateDate`
 

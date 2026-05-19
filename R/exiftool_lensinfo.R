@@ -129,7 +129,8 @@ harmonize_lensinfo <- function(paths,
   
   modify <- modify |> 
     dplyr::select(-`EXIF:FocalLengthIn35mmFormat`) |> 
-    dplyr::left_join(focallength)
+    dplyr::left_join(focallength,
+                     by = dplyr::join_by("SourceFile"))
   
   handle_return(modify, csv_execute, paths, csv_path, delete_original)
 }
