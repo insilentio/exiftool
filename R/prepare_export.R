@@ -57,9 +57,12 @@ prepare_export <- function(imp_path = "/Volumes/NoBackup/Bilder/Import/2025/",
   ht <- harmonize_time(imported, csv_execute = FALSE, offset = offset)
 
   modify <- fs |>
-    dplyr::full_join(hl) |>
-    dplyr::full_join(cl) |>
-    dplyr::full_join(ht)
+    dplyr::full_join(hl,
+                     by = dplyr::join_by("SourceFile")) |>
+    dplyr::full_join(cl,
+                     by = dplyr::join_by("SourceFile")) |>
+    dplyr::full_join(ht,
+                     by = dplyr::join_by("SourceFile"))
 
   handle_return(modify, 
                 csv_execute = TRUE, 

@@ -40,11 +40,11 @@ flatten_subject <- function(paths,
     dplyr::mutate(subject = lapply(subject, function(x) paste(unlist(x), sep='', collapse=', '))) |>
     dplyr::mutate(subject = unlist(subject)) |> 
     dplyr::select(SourceFile, subject, rating) |>
+    dplyr::mutate(subject = ifelse(subject == "NA", NA, subject)) |> 
     dplyr::mutate(`IPTC:Keywords` = subject,
                   `EXIF:Rating` = rating) |> 
     dplyr::rename(`XMP:Subject` = subject,
                   `XMP:Rating` = rating)
-  
   
   handle_return(subjects, csv_execute, paths, csv_path, delete_original, with_sep = ", ")
 }
