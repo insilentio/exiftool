@@ -11,5 +11,10 @@ Updates, harmonizes and synchonizes photo metadata with the help of exiftool Wor
 \author{
 \strong{Maintainer}: Daniel Baumgartner \email{insilentio@pm.me}
 
+Authors:
+\itemize{
+  \item Daniel Baumgartner \email{insilentio@pm.me}
+}
+
 }
 \keyword{internal}
