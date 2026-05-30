@@ -1,3 +1,6 @@
+# exifer 1.6.5
+- added metadata for Pixel Pro phone
+
 # exifer 1.6.4
 - bugfix problem with NA values in location and other tags
 - fix warning issues when updating subject tag
