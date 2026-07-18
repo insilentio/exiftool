@@ -1,3 +1,6 @@
+# exifer 1.6.6
+- added metadata for iPhone 17 Pro
+
 # exifer 1.6.5
 - added metadata for Pixel Pro phone
 
